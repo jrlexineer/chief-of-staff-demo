@@ -1,6 +1,7 @@
 # Chief of Staff: a document-filing system built to say "I'm not sure"
 
-Python · Claude API · Gmail API (read-only) · 126 tests
+Python · Claude API · Gmail API (read-only) · 126 tests  
+Demo: https://jrlexineer.github.io/chief-of-staff-demo/ · Code: https://github.com/jrlexineer/chief-of-staff-demo
 
 I spent about a month building a document-filing tool for a small residential real-estate brokerage. It works, it runs on real mail, and they didn't buy it. This is what I built, why I built it the way I did, and what I'd do differently.
 
@@ -46,6 +47,6 @@ The code is unchanged by that. The gates still hold. I'd just open with them.
 
 ---
 
-I'm Josh Tseng, an applied AI engineer and Claude Certified Architect. I build AI systems for businesses that can't afford quiet mistakes. I'm looking for forward-deployed and applied AI engineering roles: www.linkedin.com/in/joshtseng-aiops · miyamotoai.com
+I'm Josh Tseng, an applied AI engineer and Claude Certified Architect. I build AI systems for businesses that can't afford quiet mistakes. I'm looking for forward-deployed and applied AI engineering roles: https://www.linkedin.com/in/joshtseng-aiops/ · miyamotoai.com
 
 All names, addresses, and companies in the demo are fictional.
