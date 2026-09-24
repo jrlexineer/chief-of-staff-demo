@@ -1,0 +1,46 @@
+{
+  "people": [
+    "Harriet Ngoma-Bell",
+    "buyers (unnamed)",
+    "seller (unnamed)"
+  ],
+  "orgs": [
+    "Bell & Caraway LLP",
+    "condominium association (unnamed)"
+  ],
+  "dates_or_deadlines": [
+    "Closing scheduled for October 3rd at 10:00 a.m.",
+    "Condominium association resale certificate request submitted September 8th",
+    "14-day response deadline places deadline at September 22nd"
+  ],
+  "amounts": [],
+  "property_refs": [
+    "1129 Kestrel Lane",
+    "Vandermolen (transaction reference)"
+  ],
+  "doc_mentions": [
+    "Seller's disclosure statement (executed signature page received; page 4 missing)",
+    "Condominium association resale certificate",
+    "Repair addendum",
+    "Settlement statement",
+    "Wire instructions",
+    "Calendar invitation for pre-closing call"
+  ],
+  "asks_or_questions": [
+    "Please resend the complete seller's disclosure statement including page 4",
+    "Ask that your seller follow up directly with the condominium association regarding the resale certificate",
+    "Please confirm the amount your seller understands to be agreed for the credit in lieu of roof repair",
+    "Please advise your clients that wire instructions will be transmitted by Bell & Caraway's office only, by separate secure delivery, and never by email"
+  ],
+  "commitments_made": [
+    "Harriet Ngoma-Bell will circulate a settlement statement once item 3 (repair addendum amount) is resolved",
+    "Harriet Ngoma-Bell's assistant will send a calendar invitation for a pre-closing call",
+    "Wire instructions will be transmitted by Bell & Caraway's office only, by separate secure delivery, and never by email"
+  ],
+  "anything_uncertain": [
+    "Credit amount in lieu of roof repair: 'the figure discussed on the call' is referenced but no dollar amount is stated",
+    "Identity of the agent recipient is not named in the email",
+    "Condominium association is not named"
+  ],
+  "_source": "synthetic_07.txt"
+}

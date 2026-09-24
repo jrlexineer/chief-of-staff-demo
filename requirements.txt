@@ -1,0 +1,17 @@
+fastapi
+uvicorn
+pydantic
+pyyaml
+anthropic
+pytest
+
+# Gmail read adapter (app/adapters/gmail.py). google-auth-oauthlib carries the
+# InstalledAppFlow used for the desktop OAuth consent; google-auth alone cannot run it.
+google-auth
+google-auth-oauthlib
+google-api-python-client
+
+# PDF text layer (app/adapters/llm.py). The text the grounding gate checks against is
+# extracted deterministically here, not transcribed by the model -- if the model both
+# transcribed and extracted, containment would only prove it was consistent with itself.
+pypdf

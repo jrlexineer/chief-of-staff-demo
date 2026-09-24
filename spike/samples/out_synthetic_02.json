@@ -1,0 +1,40 @@
+{
+  "people": [
+    "Dale Brummett",
+    "Cheryl",
+    "Cheryl's mother"
+  ],
+  "orgs": [],
+  "dates_or_deadlines": [
+    "January (Cheryl's mother moved to the place in Fairhaven)",
+    "November (when they weren't in a position to move)",
+    "next week except Thursday (available to connect)",
+    "six weeks (hypothetical delay Dale wants to avoid)"
+  ],
+  "amounts": [
+    "about six inches (rain sitting in the side yard)"
+  ],
+  "property_refs": [
+    "the place in Fairhaven",
+    "the fence line on the north side"
+  ],
+  "doc_mentions": [
+    "garage conversion permit"
+  ],
+  "asks_or_questions": [
+    "Does the garage conversion permit change your thinking on how to price?",
+    "Do we need to do anything about the survey before we list, or is that a buyer's problem?",
+    "Cheryl wants to know whether they'll have an issue with the fence line on the north side"
+  ],
+  "commitments_made": [
+    "Dale told Cheryl he'd ask the recipient about the survey/fence line question"
+  ],
+  "anything_uncertain": [
+    "which property is being listed — no address or full description given",
+    "what 'the last time we talked' said about permit affecting pricing — content of prior conversation not quoted",
+    "who the recipient is — name not stated",
+    "'next week' is relative to 'Tuesday' with no calendar date given, so exact dates of availability cannot be determined",
+    "nature of the survey concern — only described as something Cheryl 'read online' about the fence line on the north side, no specifics"
+  ],
+  "_source": "synthetic_02.txt"
+}

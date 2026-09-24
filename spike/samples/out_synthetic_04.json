@@ -1,0 +1,43 @@
+{
+  "people": [
+    "Yolanda Prentiss <yprentiss@example.com>",
+    "Kenji Abara <kabara@example.com>",
+    "Sandra Milbrook"
+  ],
+  "orgs": [],
+  "dates_or_deadlines": [
+    "Thu, at 4:52 PM (date of Kenji's forwarded message)",
+    "the 31st (deadline to close the gap or rate lock is at risk)",
+    "five business days (window to submit additional comparables for reconsideration of value)",
+    "today (Kenji told seller's agent someone would get back to her today)"
+  ],
+  "amounts": [],
+  "property_refs": [
+    "88 Pallister Row"
+  ],
+  "doc_mentions": [
+    "appraisal report (attached per Sandra Milbrook)",
+    "comparable sales (three used; closest is a quarter mile out and smaller footprint)",
+    "additional comparables (Kenji said he would get comps over to Sandra)"
+  ],
+  "asks_or_questions": [
+    "Yolanda to Kenji's recipient: 'Can you translate?' (asking for clarification on the middle part of Kenji's message)",
+    "Kenji to Sandra: 'Are you able to hold the file open in the meantime or does the clock start regardless?'",
+    "Kenji to Yolanda: asking that communications from the seller's agent go through Yolanda rather than Kenji directly"
+  ],
+  "commitments_made": [
+    "Kenji committed to getting comps over to Sandra ('I'll get comps over to you')",
+    "Kenji told the seller's agent that someone would get back to her today",
+    "Kenji has not told the seller's agent the number"
+  ],
+  "anything_uncertain": [
+    "Exact date of Kenji's email is not stated — only 'Thu, at 4:52 PM', no full date",
+    "The appraised number (described as 'came back light') is not stated",
+    "The contract price is referenced as being above the appraised value but no figure is given",
+    "Identity of the seller's agent is not named",
+    "Lender's name or org is not stated",
+    "The rate lock terms or rate are not specified",
+    "It is unclear who authored the innermost quoted reply to Sandra ('Sandra - Understood. I'll get comps over to you...') — likely Kenji but attribution is inferred from context"
+  ],
+  "_source": "synthetic_04.txt"
+}

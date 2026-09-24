@@ -1,0 +1,41 @@
+# policy.yaml — THE enterprise ruleset. Single source of truth.
+#
+# Enforcement model: this file is loaded once at boot into a frozen Policy
+# object. The hash stamped onto every audit record is derived from that
+# object's field values, so it tracks the rules that were actually applied —
+# including for a Policy built by hand rather than loaded from here. No API
+# endpoint accepts policy parameters. Changing policy = changing this file +
+# redeploying, which is a reviewed, versioned act.
+
+version: 1
+
+# Routing rules are NOT configurable here. The grounding gate — every routing
+# field must appear verbatim in the document's text layer, or → flag — is
+# unconditional in validate.py. It was a key in this file (grounding_required)
+# until P2.1; a boolean that could switch off the load-bearing check is not a
+# policy, it is a fail-open path. A garbage scan yields a garbage text layer and
+# fails containment on its own, so no ocr_floor is needed either.
+
+documents:
+  known_doc_types: [contract, addendum, disclosure, amendment]
+  required_fields:
+    contract:   [doc_type, property_address, client_name]
+    addendum:   [doc_type, property_address, client_name]
+    disclosure: [doc_type, property_address]
+    amendment:  [doc_type, property_address, client_name]
+
+triage:
+  # never_auto_send was a key here that no code read — a policy assertion of the
+  # central safety property, enforced by nothing. Deleted in P2.4. The property is
+  # now enforced by app/scopes.py: this service's credential is gmail.readonly only.
+  categories: [active_deal, waiting_on_them, new_contact]
+  waiting_threshold_days: 3    # thread with no reply for N days → follow-up draft
+
+briefing:
+  # Read by the future sender/ process (D2) — a separate service with its own
+  # OAuth credential scoped to gmail.send ONLY, no LLM and no inbound mail access.
+  # Recipients live here and ONLY here; there is deliberately no BRIEF_RECIPIENTS
+  # env var. Nothing in app/ reads this block, and nothing in app/ can send.
+  delivery: email              # the daily brief is an email; zero client install
+  send_hour_local: "07:30"
+  recipients: []               # sender/ reads exactly this list. Empty = send nothing.

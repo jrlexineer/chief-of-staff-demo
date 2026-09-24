@@ -1,0 +1,36 @@
+{
+  "people": [
+    "Marguerite Oyelaran",
+    "Ravi",
+    "Marguerite's sister",
+    "the Hartleys"
+  ],
+  "orgs": [],
+  "dates_or_deadlines": [
+    "the 14th through the 20th",
+    "last spring"
+  ],
+  "amounts": [],
+  "property_refs": [
+    "the two on Delancey",
+    "the second one",
+    "the one with the shared drive",
+    "the Hartleys' place"
+  ],
+  "doc_mentions": [],
+  "asks_or_questions": [
+    "anything new coming up in that pocket, we're interested",
+    "if there's anything worth seeing in that window I'd like to line it up while she's here"
+  ],
+  "commitments_made": [],
+  "anything_uncertain": [
+    "buyer's approved amount not stated, only referenced as 'what we were approved for'",
+    "budget ceiling referenced as 'what the Hartleys ended up paying for theirs last spring' but no figure given",
+    "Ravi's looser budget framed as 'within reason' with no number",
+    "preferred budget is 'a fair bit under' the Hartley reference price but no figure stated",
+    "'that pocket' geographic area not specified beyond Delancey vicinity — not confirmed",
+    "the 14th through the 20th — month and year not stated",
+    "it is unclear from context whether 'the one with the shared drive' is one of the two on Delancey or a separate property"
+  ],
+  "_source": "synthetic_01.txt"
+}

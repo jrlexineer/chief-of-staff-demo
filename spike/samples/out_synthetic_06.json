@@ -1,0 +1,32 @@
+{
+  "people": [
+    "Priya",
+    "her (unnamed woman who called twice)"
+  ],
+  "orgs": [],
+  "dates_or_deadlines": [
+    "end of week",
+    "today"
+  ],
+  "amounts": [],
+  "property_refs": [],
+  "doc_mentions": [
+    "the paperwork"
+  ],
+  "asks_or_questions": [
+    "can you call her back today?",
+    "hope that's ok (re: end of week paperwork commitment)"
+  ],
+  "commitments_made": [
+    "Priya told the unnamed woman the recipient would handle it",
+    "Priya said the paperwork would be over by end of week"
+  ],
+  "anything_uncertain": [
+    "identity of 'her' / the woman who called not stated",
+    "'the thing with the appliances' — nature of appliance issue not described",
+    "which property or transaction this relates to is not stated",
+    "'end of week' not resolved to a specific date",
+    "unclear whether 'hope that's ok' means Priya made the commitment without checking with recipient first"
+  ],
+  "_source": "synthetic_06.txt"
+}

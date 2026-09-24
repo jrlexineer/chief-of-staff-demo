@@ -1,0 +1,26 @@
+{
+  "people": [
+    "Tomasz W.",
+    "brother in law"
+  ],
+  "orgs": [],
+  "dates_or_deadlines": [
+    "before the weekend",
+    "friday afternoon"
+  ],
+  "amounts": [],
+  "property_refs": [
+    "4417 Ellsworth"
+  ],
+  "doc_mentions": [],
+  "asks_or_questions": [
+    "is that one actually still available or is the sign just sitting there?",
+    "if it is still live i'd want to see it before the weekend"
+  ],
+  "commitments_made": [],
+  "anything_uncertain": [
+    "whether 4417 Ellsworth is still available or under contract — sender does not know and is asking",
+    "brother in law claims it went under contract weeks ago but sender doubts him — status unconfirmed"
+  ],
+  "_source": "synthetic_03.txt"
+}

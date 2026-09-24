@@ -1,0 +1,31 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local audit store. Payloads are redacted at the writer (app/redact.py) and any row
+# predating that is swept at store.init(), so a DB no longer holds document text —
+# but it still holds addresses, client names and the decision history. Never commit one.
+data.sqlite
+*.db
+*.sqlite
+*.sqlite3
+
+# OAuth client secrets and token caches
+.env
+credentials/
+credentials.json
+*.credentials.json
+token.json
+
+# Live-run ground truth: real transaction addresses mapped to real Drive folder ids.
+# The .example file is committed; the real one is client data and is not.
+live/known_folders.json
+
+.venv/
+venv/
+
+# Real email exports dropped into the extraction spike. Sanitized or not, they are
+# client correspondence and never belong in the repo. Synthetic samples are committed.
+spike/samples/real_*
+spike/samples/out_real_*
+

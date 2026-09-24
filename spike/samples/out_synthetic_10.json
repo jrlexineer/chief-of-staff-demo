@@ -1,0 +1,46 @@
+{
+  "people": [
+    "Adaeze Fontaine-Okoro",
+    "Chidi",
+    "Adaeze's husband"
+  ],
+  "orgs": [
+    "HR",
+    "Adaeze's company (new office)",
+    "lender (unnamed)"
+  ],
+  "dates_or_deadlines": [
+    "back half of the quarter (revised move timeline)",
+    "after Chidi's term ends (earliest realistic physical move)",
+    "tonight (sending preapproval letter)"
+  ],
+  "amounts": [],
+  "property_refs": [
+    "the one on Wrenfield",
+    "the newer build near the water (shown by colleague)"
+  ],
+  "doc_mentions": [
+    "relocation package",
+    "actual policy language (relocation/dual-carry policy)",
+    "summary slide (relocation policy summary)",
+    "lender's preapproval letter"
+  ],
+  "asks_or_questions": [
+    "realistic sense of what comes on in that neighborhood between now and then",
+    "whether it's worth writing on something now versus waiting"
+  ],
+  "commitments_made": [
+    "will send lender's preapproval letter tonight",
+    "will loop in husband on this thread"
+  ],
+  "anything_uncertain": [
+    "which neighborhood is referred to -- not named explicitly",
+    "husband's name not stated",
+    "colleague who showed the newer build not named",
+    "company's dual-carry / relocation housing policy coverage amount and terms described as unconfirmed -- Adaeze has only seen a summary slide, not the actual policy",
+    "front half of the quarter as original timeline implied by contrast but not explicitly stated",
+    "Adaeze's time zone not named, only described as three hours ahead of recipient's",
+    "four properties toured total -- only two described; details on the other two not provided"
+  ],
+  "_source": "synthetic_10.txt"
+}

@@ -1,0 +1,41 @@
+{
+  "people": [
+    "Curtis Mbeki-Rowan",
+    "Curtis"
+  ],
+  "orgs": [
+    "Rowan Inspection Services"
+  ],
+  "dates_or_deadlines": [
+    "Thursday (date the full PDF was sent)"
+  ],
+  "amounts": [
+    "a couple hundred in labor (GFCI work)",
+    "range we talked about on site (panel replacement)",
+    "anywhere from what you'd expect for a weekend job to genuinely eye-watering (crawlspace remediation)"
+  ],
+  "property_refs": [
+    "the Aldergrove property"
+  ],
+  "doc_mentions": [
+    "full PDF sent to the address you gave me on Thursday",
+    "My report has the moisture readings and photos, it's the section starting on page 11"
+  ],
+  "asks_or_questions": [
+    "If it didn't land let me know and I'll resend",
+    "Somebody should (pump or scope the septic tank) before your people sign anything"
+  ],
+  "commitments_made": [
+    "I'll throw in the parts (for GFCI work)",
+    "I'll resend (the PDF) if it didn't land"
+  ],
+  "anything_uncertain": [
+    "panel replacement range not stated — described only as 'the range we talked about on site', no figure given",
+    "whether service entrance must be moved is unresolved pending utility response",
+    "crawlspace remediation cost range not quantified — described in relative terms only",
+    "recipient identity not stated in the email",
+    "exact Thursday date not specified",
+    "'your people' identity not specified"
+  ],
+  "_source": "synthetic_09.txt"
+}

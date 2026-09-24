@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meridian Residential — Chief of Staff</title>
+<style>
+/* ============================================================
+   Chief of Staff — a provenance-first demonstration.
+   Single file, no build, no network.
+
+   THE RULE: every claim on screen is either SOURCED (carries a chip
+   that opens the record it came from) or FLAGGED (a [CONFIRM] block).
+   There is no third state. render() asserts it.
+
+   REGISTER: a private-bank document register, not a SaaS dashboard.
+   Ivory ground, near-black ink, one accent (brass) used sparingly.
+   Serif display over a quiet grotesque. Hairline rules, never card
+   shadows. Square corners. Tabular numerals on every figure.
+   No gradients, no glass, no emoji, no icons that wink.
+   ============================================================ */
+
+:root{
+  color-scheme: light;
+
+  --ivory:        #FBF9F5;
+  --ivory-deep:   #F4F0E8;
+  --paper:        #FFFFFF;
+  --charcoal:     #23211E;
+  --ink:          #2E2B27;
+  --muted:        #6F6962;
+  --faint:        #948D84;
+  --rule:         #E4DED2;
+  --rule-soft:    #EFEAE0;
+  --brass:        #9C7C3C;
+  --brass-lift:   #B08D4F;
+  --brass-wash:   #F7F1E4;
+
+  /* Brass is THE accent — chips, rules, marks, the one lit thing on a page.
+     Oxblood is not a second accent. It is exception ink, in the sense a ledger
+     means it: it appears in exactly three places, all of them a refusal to act
+     (a gate that did not pass, a document held, a thread past its threshold),
+     and never for emphasis, never for decoration, never on anything good. */
+  --oxblood:      #7A2E2E;
+
+  /* Display: a transitional serif with a printed spine. Body: a quiet
+     grotesque, chosen for its boredom. Both are system stacks on purpose —
+     nothing here should have to be downloaded to look like itself. */
+  --serif: "Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,"Times New Roman",serif;
+  --sans: -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,"Helvetica Neue",Arial,sans-serif;
+
+  --gutter: 40px;
+  --measure: 1120px;
+  --drawer: 540px;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background: var(--ivory); color: var(--ink);
+  font-family: var(--sans); font-size:15px; line-height:1.62;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  /* Figures are read down a column, not across a sentence. */
+  font-variant-numeric: tabular-nums;
+}
+body.drawer-open{ overflow:hidden; }
+
+.label{ font-size:10.5px; letter-spacing:.17em; text-transform:uppercase; color:var(--faint); font-weight:600; }
+.label-brass{ color: var(--brass); }
+
+h1,h2,h3,h4{ font-family: var(--serif); font-weight:400; color: var(--charcoal); margin:0; }
+h1{ font-size: clamp(1.9rem,3.6vw,2.7rem); line-height:1.16; letter-spacing:-.012em; }
+h2{ font-size: clamp(1.3rem,2.2vw,1.7rem); line-height:1.24; }
+h3{ font-size:1.18rem; line-height:1.3; }
+h4{ font-size:1.02rem; line-height:1.35; }
+p{ margin:0 0 1em; } p:last-child{ margin-bottom:0; }
+.muted{ color: var(--muted); }
+.num{ font-variant-numeric: tabular-nums; }
+
+/* ---------- masthead ----------
+   Opaque. A frosted, blurred bar is the single loudest tell that a page was
+   built this decade rather than kept in a drawer; the ledger it wants to
+   resemble is printed on stock you cannot see through. */
+.masthead{ position:sticky; top:0; z-index:40; background:var(--ivory); border-bottom:1px solid var(--charcoal); }
+.masthead-in{ max-width:var(--measure); margin:0 auto; padding:18px var(--gutter); display:flex; align-items:center; justify-content:space-between; gap:24px; }
+.wordmark{ font-family:var(--serif); font-size:1.22rem; letter-spacing:.34em; text-transform:uppercase; color:var(--charcoal); }
+.wordmark small{ display:block; font-family:var(--sans); font-size:9.5px; letter-spacing:.2em; color:var(--faint); margin-top:4px; text-transform:uppercase; font-weight:600; }
+/* The register is kept for one named person. */
+.holder{ text-align:right; line-height:1.35; }
+.holder .nm{ font-family:var(--serif); font-size:1.02rem; color:var(--charcoal); }
+.holder .ti{ font-size:9.5px; letter-spacing:.19em; text-transform:uppercase; color:var(--faint); font-weight:600; }
+.steps{ display:flex; align-items:center; }
+.step{ display:flex; align-items:center; gap:9px; padding:0 15px; color:var(--faint); transition:color .4s ease; }
+.step + .step{ border-left:1px solid var(--rule); }
+.step .ix{ font-family:var(--serif); font-size:.9rem; color:var(--faint); transition:color .4s ease; }
+.step .nm{ font-size:10.5px; letter-spacing:.15em; text-transform:uppercase; font-weight:600; }
+.step.on{ color:var(--charcoal); }
+.step.on .ix{ color:var(--brass); }
+.step.done{ color:var(--muted); }
+.step.done .ix{ color:var(--brass-lift); }
+
+/* ---------- persistent connection bar ---------- */
+.connbar{
+  position:sticky; top:78px; z-index:39;
+  background: var(--ivory-deep); border-bottom:1px solid var(--rule);
+}
+.connbar-in{
+  max-width:var(--measure); margin:0 auto; padding:9px var(--gutter);
+  display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap;
+  font-size:11.5px; color:var(--muted); letter-spacing:.02em;
+}
+.connbar .srcs{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.connbar .lead{ font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--faint); font-weight:600; }
+.connbar .src-tag{ display:inline-flex; align-items:center; gap:7px; color:var(--ink); }
+.connbar .src-tag:before{ content:""; width:3px; height:3px; background:var(--brass); }
+.connbar .sep{ color:var(--rule); }
+.connbar .assure{ display:flex; flex-wrap:wrap; justify-content:flex-end; gap:2px 18px; text-align:right; }
+.connbar .assure span{ white-space:nowrap; }
+.connbar .assure .setup{ color:var(--muted); }
+.connbar .assure .book{ color:var(--charcoal); }
+
+/* Margins are generous on purpose. Space is the cheapest signal of confidence
+   a page has, and the only one that cannot be faked with an accent colour. */
+main{ max-width:var(--measure); margin:0 auto; padding:0 var(--gutter) 170px; }
+.screen{ display:none; padding-top:66px; }
+.screen.live{ display:block; }
+@keyframes rise{ from{opacity:0; transform:translateY(9px);} to{opacity:1; transform:none;} }
+.rise{ animation: rise .34s cubic-bezier(.22,.68,.34,1) both; }
+
+.eyebrow{ display:flex; align-items:center; gap:14px; margin-bottom:20px; }
+.eyebrow .bar{ width:26px; height:1px; background:var(--brass); }
+.deck{ font-family:var(--serif); font-size:1.04rem; color:var(--muted); max-width:62ch; margin-top:16px; }
+
+.panel{ background:var(--paper); border:1px solid var(--rule); border-radius:0; }
+.panel + .panel{ margin-top:22px; }
+.hr{ height:1px; background:var(--rule-soft); border:0; margin:0; }
+.sec-head{ display:flex; align-items:baseline; justify-content:space-between; gap:20px; padding:22px 30px 16px; }
+.sec-head .src{ font-size:10.5px; letter-spacing:.13em; text-transform:uppercase; color:var(--faint); font-weight:600; }
+.sec-body{ padding:22px 30px 28px; }
+
+/* ---------- THE CHIP ---------- */
+.chip{
+  display:inline-flex; align-items:center; gap:6px;
+  font-family:var(--sans); font-size:10.5px; letter-spacing:.05em;
+  color:var(--brass); background:var(--brass-wash);
+  border:1px solid rgba(156,124,60,.3); border-radius:0;
+  padding:2px 8px; margin-left:8px;
+  cursor:pointer; white-space:nowrap; vertical-align:middle;
+  transition: background .18s, border-color .18s, color .18s;
+  font-weight:600;
+}
+.chip:hover, .chip:focus-visible{ background:var(--brass); border-color:var(--brass); color:#fff; outline:none; }
+.chip:before{ content:""; width:3px; height:3px; background:currentColor; opacity:.75; }
+.chip.nil{ color:var(--muted); background:transparent; border-color:var(--rule); border-style:dashed; }
+.chip.nil:hover, .chip.nil:focus-visible{ background:var(--muted); border-color:var(--muted); color:#fff; }
+.chip.derived{ color:var(--muted); background:transparent; border-color:var(--rule); }
+.chip.derived:hover, .chip.derived:focus-visible{ background:var(--charcoal); border-color:var(--charcoal); color:#fff; }
+
+/* ---------- counter ---------- */
+.tally-bar{
+  display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:14px 28px;
+  margin:24px 0 30px; padding:18px 24px;
+  background:var(--brass-wash); border:1px solid rgba(156,124,60,.22); border-radius:0;
+}
+.count{ font-family:var(--serif); font-size:1.18rem; color:var(--charcoal); display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; }
+.count b{ font-weight:400; color:var(--brass); }
+.count .div{ color:rgba(156,124,60,.45); }
+.integrity{ width:100%; padding-top:14px; margin-top:2px; border-top:1px solid rgba(156,124,60,.2); font-size:11.5px; color:var(--muted); }
+.integrity b{ color:var(--brass); font-weight:600; }
+.integrity.bad{ color:#8B2F2F; }
+
+/* the briefing is an email too — same chrome as the inbound message */
+.brief-tally{ padding:0 40px 30px; }
+.brief-tally .tally-bar{ margin:0; }
+
+/* ---------- email, rendered from the record ---------- */
+.mail-chrome{ display:flex; align-items:center; justify-content:space-between; padding:14px 26px; border-bottom:1px solid var(--rule); background:var(--ivory-deep); }
+.envelope{ width:22px; height:15px; border:1px solid var(--brass); border-radius:0; position:relative; overflow:hidden; }
+.envelope:after{ content:""; position:absolute; left:50%; top:-6px; width:12px; height:12px; margin-left:-6px; border-right:1px solid var(--brass); border-bottom:1px solid var(--brass); transform:rotate(45deg); }
+.mail-head{ padding:32px 40px 24px; }
+.mail-meta{ display:grid; grid-template-columns:84px 1fr; gap:7px 20px; font-size:13.5px; padding-top:18px; border-top:1px solid var(--rule-soft); }
+.mail-meta dt{ color:var(--faint); font-size:10.5px; letter-spacing:.15em; text-transform:uppercase; font-weight:600; padding-top:3px; }
+.mail-meta dd{ margin:0; color:var(--ink); }
+.mail-body{ padding:4px 40px 36px; }
+.para{ display:grid; grid-template-columns:44px 1fr; gap:0 14px; align-items:start; padding:0 0 16px; }
+.para .pn{ font-size:10.5px; letter-spacing:.08em; color:var(--faint); font-weight:600; padding-top:.42em; font-variant-numeric:tabular-nums; }
+.para .pt{ font-family:var(--serif); font-size:1.02rem; line-height:1.68; max-width:66ch; }
+.para.q .pt{ padding-left:14px; border-left:2px solid var(--brass-wash); }
+.para.q.unanswerable .pt{ border-left-color:var(--rule); }
+
+/* ---------- fact rows ---------- */
+.facts{ list-style:none; margin:0; padding:0; }
+.facts li{ padding:13px 0; border-bottom:1px solid var(--rule-soft); }
+.facts li:last-child{ border-bottom:0; padding-bottom:0; }
+.facts .k{ font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--faint); font-weight:600; margin-bottom:5px; }
+.facts .t{ font-family:var(--serif); font-size:1.04rem; color:var(--charcoal); }
+
+.grid2{ display:grid; grid-template-columns:1fr 1fr; gap:0 40px; }
+.grid2 > ul{ margin:0; }
+
+table.comps{ width:100%; border-collapse:collapse; font-size:13.5px; }
+table.comps th{ text-align:left; font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--faint); font-weight:600; padding:0 14px 10px 0; border-bottom:1px solid var(--rule); }
+table.comps th.r, table.comps td.r{ text-align:right; padding-right:0; }
+table.comps td{ padding:14px 14px 14px 0; border-bottom:1px solid var(--rule-soft); vertical-align:top; }
+table.comps tr:last-child td{ border-bottom:0; }
+table.comps .addr{ font-family:var(--serif); font-size:1.02rem; color:var(--charcoal); }
+table.comps .addr small{ display:block; font-family:var(--sans); font-size:11.5px; color:var(--faint); margin-top:2px; }
+table.comps .price{ font-family:var(--serif); font-size:1.02rem; color:var(--charcoal); }
+
+/* ---------- the off-market panel ---------- */
+.insight{ border-color:rgba(156,124,60,.34); position:relative; overflow:hidden; }
+.insight:before{ content:""; position:absolute; left:0; top:0; bottom:0; width:2px; background:var(--brass); }
+.insight .sec-head, .insight .sec-body{ padding-left:32px; }
+.insight-lead{ font-family:var(--serif); font-size:1.2rem; line-height:1.56; color:var(--charcoal); max-width:64ch; }
+
+/* ---------- CONFIRM blocks — calm, never alarming ---------- */
+.confirm-block{
+  border:1px solid var(--rule); border-left:2px solid var(--brass-lift);
+  background:var(--ivory-deep); border-radius:0;
+  padding:20px 24px; margin:0;
+}
+.confirm-block + .confirm-block{ margin-top:14px; }
+.confirm-block .cb-label{ font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--brass); font-weight:600; margin-bottom:10px; display:block; }
+.confirm-block .cb-ask{ font-family:var(--serif); font-size:1.06rem; color:var(--charcoal); margin-bottom:10px; }
+.confirm-block .cb-why{ font-size:12.5px; color:var(--muted); }
+.confirm-block .cb-do{ margin-top:12px; padding-top:12px; border-top:1px solid var(--rule); font-size:12.5px; color:var(--ink); }
+.confirm-block .cb-do b{ font-weight:600; color:var(--charcoal); }
+.confirm-inline{
+  display:inline; background:var(--ivory-deep); border-bottom:1px solid var(--brass-lift);
+  color:var(--ink); font-family:var(--sans); font-size:12.5px; padding:2px 7px; border-radius:0;
+}
+
+/* ---------- reply skeleton ---------- */
+.skeleton{ font-family:var(--serif); font-size:1.02rem; line-height:1.78; max-width:74ch; }
+.skeleton .line{ padding:0 0 20px; }
+.skeleton .line:last-child{ padding-bottom:0; }
+.skeleton .cue{ display:block; font-family:var(--sans); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--faint); font-weight:600; margin-bottom:6px; }
+
+/* ---------- checklist ---------- */
+.check{ list-style:none; margin:0; padding:0; }
+.check li{ display:flex; gap:16px; align-items:flex-start; padding:15px 0; border-bottom:1px solid var(--rule-soft); cursor:pointer; user-select:none; }
+.check li:last-child{ border-bottom:0; padding-bottom:0; }
+.check .bx{ width:16px; height:16px; border:1px solid var(--rule); border-radius:0; flex:none; margin-top:3px; position:relative; transition:border-color .2s, background .2s; }
+.check li:hover .bx{ border-color:var(--brass); }
+.check li.done .bx{ border-color:var(--brass); background:var(--brass); }
+.check li.done .bx:after{ content:""; position:absolute; left:5px; top:2px; width:4px; height:8px; border-right:1.5px solid #fff; border-bottom:1.5px solid #fff; transform:rotate(42deg); }
+.check .txt{ font-family:var(--serif); font-size:1.02rem; color:var(--charcoal); }
+.check .txt small{ display:block; font-family:var(--sans); font-size:12px; color:var(--faint); margin-top:3px; }
+.check li.done .txt{ color:var(--faint); text-decoration:line-through; text-decoration-color:rgba(148,141,132,.5); }
+.check li.done .txt small{ text-decoration:none; }
+.tally{ font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--faint); font-weight:600; }
+.tally.full{ color:var(--brass); }
+
+.caption-rule{ margin:24px 0 30px; padding:18px 24px; border-top:1px solid var(--charcoal); border-bottom:1px solid var(--rule); font-family:var(--serif); font-size:1.04rem; color:var(--charcoal); display:flex; gap:16px; align-items:stretch; }
+.caption-rule .q{ flex:none; width:2px; background:var(--brass); }
+
+.block-head{ display:flex; align-items:center; justify-content:space-between; gap:20px; padding:20px 28px; border-bottom:1px solid var(--rule-soft); }
+.block-head .lhs{ display:flex; align-items:baseline; gap:14px; }
+.block-head .idx{ font-family:var(--serif); font-size:.95rem; color:var(--brass); }
+
+/* ---------- 01 FILING ---------- */
+
+/* The attachment, named the way it actually arrived. Marked with a rule rather
+   than a paperclip glyph — a drawn icon at this size reads as a smudge, and the
+   rule is doing the same job with none of the whimsy. */
+.attach{ display:flex; align-items:stretch; gap:16px; padding:16px 40px 24px; }
+.attach .mark{ width:2px; background:var(--brass); flex:none; }
+.attach .fn{ font-family:var(--serif); font-size:1.02rem; color:var(--charcoal); }
+.attach .fs{ font-size:11.5px; color:var(--faint); }
+
+/* extracted fields — a register column, not a card grid */
+.fields{ list-style:none; margin:0; padding:0; }
+.fields li{ display:grid; grid-template-columns:170px 1fr; gap:0 24px; align-items:baseline;
+  padding:15px 0; border-bottom:1px solid var(--rule-soft); }
+.fields li:last-child{ border-bottom:0; padding-bottom:0; }
+.fields .fk{ font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--faint); font-weight:600; }
+.fields .fv{ font-family:var(--serif); font-size:1.06rem; color:var(--charcoal); }
+
+/* gates — quiet. They are a receipt, not a scoreboard. */
+.gates{ display:flex; flex-wrap:wrap; gap:0 28px; padding:16px 30px; border-top:1px solid var(--rule-soft);
+  font-size:11.5px; color:var(--muted); }
+.gates .g{ display:inline-flex; align-items:baseline; gap:8px; white-space:nowrap; }
+.gates .g:before{ content:""; width:5px; height:5px; background:var(--brass); align-self:center; }
+.gates .g.no:before{ background:transparent; border:1px solid var(--oxblood); }
+.gates .g.no{ color:var(--oxblood); }
+.gates .gk{ letter-spacing:.02em; }
+
+/* the outcome cards */
+.outcome{ border:1px solid var(--charcoal); background:var(--paper); padding:24px 30px; }
+.outcome .ok{ font-size:10px; letter-spacing:.17em; text-transform:uppercase; color:var(--brass); font-weight:600; }
+.outcome.held{ border-color:var(--rule); background:var(--ivory-deep); }
+.outcome.held .ok{ color:var(--oxblood); }
+.outcome .line{ font-family:var(--serif); font-size:1.2rem; color:var(--charcoal); margin-top:10px; line-height:1.45; }
+.outcome .sub{ font-size:12.5px; color:var(--muted); margin-top:12px; padding-top:12px; border-top:1px solid var(--rule-soft); max-width:74ch; }
+.path{ font-family:var(--sans); font-size:.94rem; letter-spacing:.01em; color:var(--charcoal);
+  border-bottom:1px solid var(--brass); padding-bottom:1px; }
+
+/* ---------- 02 THE THREAD ---------- */
+.thread{ list-style:none; margin:0; padding:0; }
+.thread li{ display:grid; grid-template-columns:132px 1fr; gap:0 24px; padding:13px 0;
+  border-bottom:1px solid var(--rule-soft); align-items:baseline; }
+.thread li:last-child{ border-bottom:0; }
+.thread .tw{ font-size:11.5px; color:var(--faint); }
+.thread .tx{ font-size:13.5px; color:var(--ink); }
+.thread .tx b{ font-weight:600; color:var(--charcoal); }
+.thread li.gap{ background:var(--ivory-deep); }
+.thread li.gap .tw{ color:var(--oxblood); font-weight:600; }
+.thread li.gap .tx{ color:var(--charcoal); }
+
+/* the overdue notice — stated, never alarmed */
+.overdue{ border-left:2px solid var(--oxblood); background:var(--ivory-deep); border-top:1px solid var(--rule);
+  border-right:1px solid var(--rule); border-bottom:1px solid var(--rule); padding:20px 24px; }
+.overdue .ol{ font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--oxblood); font-weight:600; }
+.overdue .ot{ font-family:var(--serif); font-size:1.1rem; color:var(--charcoal); margin-top:9px; }
+.overdue .ow{ font-size:12.5px; color:var(--muted); margin-top:10px; max-width:76ch; }
+
+/* ---------- source drawer ---------- */
+.scrim{ position:fixed; inset:0; background:rgba(35,33,30,.28); opacity:0; pointer-events:none; transition:opacity .28s ease; z-index:60; }
+.scrim.open{ opacity:1; pointer-events:auto; }
+.drawer{
+  position:fixed; top:0; right:0; bottom:0; width:var(--drawer); max-width:100%;
+  background:var(--paper); border-left:1px solid var(--charcoal);
+  transform:translateX(100%); transition:transform .3s cubic-bezier(.3,.7,.3,1);
+  z-index:61; display:flex; flex-direction:column;
+  /* Separated by a rule and the scrim behind it, not by a shadow. */
+}
+.drawer.open{ transform:none; }
+.drawer-head{ padding:22px 28px 18px; border-bottom:1px solid var(--rule); background:var(--ivory-deep); }
+.drawer-head .kind{ font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--brass); font-weight:600; }
+.drawer-head h3{ margin-top:8px; }
+.drawer-head .meta{ font-size:12px; color:var(--faint); margin-top:6px; }
+.drawer-close{ position:absolute; top:20px; right:22px; width:28px; height:28px; border:1px solid var(--rule); background:var(--paper); border-radius:0; cursor:pointer; color:var(--muted); font-size:15px; line-height:1; display:flex; align-items:center; justify-content:center; }
+.drawer-close:hover{ color:var(--brass); border-color:var(--brass); }
+.drawer-body{ overflow-y:auto; padding:8px 0 28px; flex:1; }
+.srcline{ display:grid; grid-template-columns:92px 1fr; gap:0 14px; padding:11px 28px; align-items:start; border-left:2px solid transparent; }
+.srcline .sl-k{ font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--faint); font-weight:600; padding-top:.32em; }
+.srcline .sl-v{ font-family:var(--serif); font-size:.98rem; line-height:1.62; color:var(--ink); }
+.srcline.hit{ background:var(--brass-wash); border-left-color:var(--brass); }
+.srcline.hit .sl-k{ color:var(--brass); }
+.srcline.hit .sl-v{ color:var(--charcoal); }
+.srcline.empty .sl-v{ color:var(--faint); font-style:italic; }
+.drawer-foot{ padding:16px 28px; border-top:1px solid var(--rule); background:var(--ivory-deep); font-size:11.5px; color:var(--muted); }
+.drawer-foot b{ color:var(--charcoal); font-weight:600; }
+.derived-calc{ padding:18px 28px; font-size:13px; color:var(--ink); }
+.derived-calc .row{ display:flex; justify-content:space-between; gap:16px; padding:8px 0; border-bottom:1px solid var(--rule-soft); }
+.derived-calc .row:last-of-type{ border-bottom:0; }
+.derived-calc .out{ margin-top:14px; padding-top:14px; border-top:1px solid var(--rule); font-family:var(--serif); font-size:1.1rem; color:var(--charcoal); }
+
+/* ---------- dock ---------- */
+/* Solid, with a rule across the top. A gradient fade is a way of avoiding a
+   decision about where the page ends; a register just ends. */
+.dock{ position:fixed; left:0; right:0; bottom:0; z-index:50; background:var(--ivory); border-top:1px solid var(--rule); padding:20px var(--gutter); pointer-events:none; }
+.dock-in{ max-width:var(--measure); margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:24px; pointer-events:auto; }
+.hint{ font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--faint); font-weight:600; }
+.advance{ font-size:11px; letter-spacing:.2em; text-transform:uppercase; font-weight:600; color:var(--ivory); background:var(--charcoal); border:1px solid var(--charcoal); border-radius:0; padding:15px 30px; cursor:pointer; display:inline-flex; align-items:center; gap:14px; transition:background .22s,border-color .22s; }
+.advance:hover{ background:var(--brass); border-color:var(--brass); }
+.advance.ghost{ background:transparent; color:var(--muted); border-color:var(--rule); }
+.advance.ghost:hover{ color:var(--brass); border-color:var(--brass); background:var(--brass-wash); }
+.footnote{ font-size:11px; color:var(--faint); }
+
+/* ---------- public footer ---------- */
+/* Sits at the end of the register, above the dock. A hairline and a
+   single quiet line — it states what the page is and then stops. */
+.pubfoot{ margin-top:72px; padding-top:18px; border-top:1px solid var(--rule);
+  font-size:11px; letter-spacing:.02em; color:var(--faint); }
+
+@media (max-width:900px){
+  :root{ --gutter:22px; }
+  .grid2{ grid-template-columns:1fr; }
+  .connbar-in{ font-size:11px; }
+  .steps .nm{ display:none; }
+  .wordmark{ font-size:1rem; letter-spacing:.2em; }
+  .step{ padding:0 10px; }
+  .mail-head,.mail-body,.brief-tally{ padding-left:22px; padding-right:22px; }
+  .para{ grid-template-columns:34px 1fr; }
+  .table-scroll{ overflow-x:auto; }
+  .srcline{ grid-template-columns:1fr; gap:4px; }
+}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-in">
+    <div class="wordmark">Meridian Residential<small>Chief of Staff · Demonstration</small></div>
+    <nav class="steps">
+      <div class="step on" data-step="1"><span class="ix">I</span><span class="nm">Filing</span></div>
+      <div class="step" data-step="2"><span class="ix">II</span><span class="nm">The thread</span></div>
+      <div class="step" data-step="3"><span class="ix">III</span><span class="nm">Briefing</span></div>
+      <div class="step" data-step="4"><span class="ix">IV</span><span class="nm">Reply blocks</span></div>
+    </nav>
+    <div class="holder">
+      <div class="nm">Vivienne Aster</div>
+      <div class="ti">Principal Broker</div>
+    </div>
+  </div>
+</header>
+
+<!-- persistent, every screen -->
+<div class="connbar">
+  <div class="connbar-in">
+    <div class="srcs">
+      <span class="lead">Connected</span>
+      <span class="src-tag">your inbox <span class="muted">(read-only)</span></span>
+      <span class="sep">·</span>
+      <span class="src-tag">your Drive <span class="muted">(Active Transactions)</span></span>
+      <span class="sep">·</span>
+      <span class="src-tag">your notes</span>
+      <span class="sep">·</span>
+      <span class="src-tag">listings DB</span>
+    </div>
+    <div class="assure">
+      <span class="setup">Setup: one read-only authorization. Nothing to install or learn.</span>
+      <span class="book">Not pooled with any other agent's book.</span>
+    </div>
+  </div>
+</div>
+
+<main>
+
+<!-- ══════════════ 01 FILING ══════════════ -->
+<section class="screen live" id="s1">
+  <div class="rise">
+    <div class="eyebrow"><span class="bar"></span><span class="label label-brass">I — Filing</span></div>
+    <h1>A signed addendum arrives at 8:12. Nobody opens it.</h1>
+    <p class="deck">Two documents, the same morning. The first files itself. The second does not,
+    and the difference between them is the whole product.</p>
+  </div>
+
+  <!-- ── document A: it files ── -->
+  <div class="panel rise" style="animation-delay:.04s; margin-top:34px;">
+    <div class="mail-chrome">
+      <span class="label" style="display:flex;align-items:center;gap:12px"><span class="envelope"></span> Inbox — Vivienne Aster</span>
+      <span class="label">8:12 AM</span>
+    </div>
+    <div class="mail-head">
+      <h2>Signed addendum — 12 Oak St</h2>
+      <dl class="mail-meta">
+        <dt>From</dt><dd>Dana Okonjo &lt;d.okonjo@merrittitle.example&gt;</dd>
+        <dt>To</dt><dd>Vivienne Aster &lt;v.aster@meridian-residential.example&gt;</dd>
+        <dt>Received</dt><dd>Thursday, 8:12 AM</dd>
+      </dl>
+    </div>
+    <div class="attach">
+      <span class="mark"></span>
+      <span>
+        <span class="fn">Addendum_signed_FINAL(2).pdf</span>
+        <span class="fs"> — 3 pages · 412 KB · text layer extracted</span>
+      </span>
+    </div>
+  </div>
+
+  <div class="panel rise" style="animation-delay:.08s">
+    <div class="sec-head"><h3>What was read out of it</h3><span class="src">Every field chipped to its line</span></div>
+    <hr class="hr">
+    <div class="sec-body"><ul class="fields" id="fieldsA"></ul></div>
+    <div class="gates" id="gatesA"></div>
+  </div>
+
+  <div class="rise" style="animation-delay:.12s; margin-top:22px">
+    <div class="outcome">
+      <div class="ok">Filed · 8:12 AM</div>
+      <div class="line">Routed to <span class="path" id="routedPath"></span></div>
+      <div class="sub" id="routedSub"></div>
+    </div>
+  </div>
+
+  <!-- ── document B: it does not ── -->
+  <div class="panel rise" style="animation-delay:.16s; margin-top:44px;">
+    <div class="mail-chrome">
+      <span class="label" style="display:flex;align-items:center;gap:12px"><span class="envelope"></span> Inbox — Vivienne Aster</span>
+      <span class="label">9:03 AM</span>
+    </div>
+    <div class="mail-head">
+      <h2>Addendum, executed — Fennimore</h2>
+      <dl class="mail-meta">
+        <dt>From</dt><dd>Rafael Iturbe &lt;r.iturbe@bayside-legal.example&gt;</dd>
+        <dt>To</dt><dd>Vivienne Aster &lt;v.aster@meridian-residential.example&gt;</dd>
+        <dt>Received</dt><dd>Thursday, 9:03 AM</dd>
+      </dl>
+    </div>
+    <div class="attach">
+      <span class="mark"></span>
+      <span>
+        <span class="fn">addendum_exec.pdf</span>
+        <span class="fs"> — 2 pages · 288 KB · text layer extracted</span>
+      </span>
+    </div>
+  </div>
+
+  <div class="panel rise" style="animation-delay:.2s">
+    <div class="sec-head"><h3>What was read out of it</h3><span class="src">Same fields, same chips</span></div>
+    <hr class="hr">
+    <div class="sec-body"><ul class="fields" id="fieldsB"></ul></div>
+    <div class="gates" id="gatesB"></div>
+  </div>
+
+  <div class="rise" style="animation-delay:.24s; margin-top:22px">
+    <div class="outcome held">
+      <div class="ok">Held · 9:03 AM</div>
+      <div class="line">Held for review — no matching folder.</div>
+      <div class="sub" id="heldSub"></div>
+    </div>
+  </div>
+
+  <div class="caption-rule rise" style="animation-delay:.28s">
+    <span class="q"></span>
+    <span>Filed only when every field is grounded and exactly one folder matches.
+    Anything less waits for a human.</span>
+  </div>
+</section>
+
+<!-- ══════════════ 02 THE THREAD ══════════════ -->
+<section class="screen" id="s2">
+  <div class="rise">
+    <div class="eyebrow"><span class="bar"></span><span class="label label-brass">II — The thread</span></div>
+    <h1>A client you already have, four days without a reply.</h1>
+    <p class="deck">Paragraphs are numbered because every claim the system makes downstream will
+    point back to one of them by number.</p>
+  </div>
+
+  <div class="panel rise" style="animation-delay:.04s; margin-top:34px">
+    <div class="sec-head"><h3>The thread so far</h3><span class="src">Your inbox · read-only</span></div>
+    <hr class="hr">
+    <div class="sec-body"><ul class="thread" id="threadList"></ul></div>
+  </div>
+
+  <div class="rise" style="animation-delay:.08s; margin-top:22px">
+    <div class="overdue">
+      <div class="ol">Follow-up overdue</div>
+      <div class="ot" id="overdueLine"></div>
+      <div class="ow" id="overdueWhy"></div>
+    </div>
+  </div>
+
+  <div class="panel rise" style="animation-delay:.12s; margin-top:22px">
+    <div class="mail-chrome">
+      <span class="label" style="display:flex;align-items:center;gap:12px"><span class="envelope"></span> Inbox — Vivienne Aster</span>
+      <span class="label">Unread · 9:47 AM</span>
+    </div>
+    <div class="mail-head">
+      <h2>Re: Coriander Lane — still the two questions</h2>
+      <dl class="mail-meta">
+        <dt>From</dt><dd>Adrian Kessler &lt;a.kessler@halcyonrobotics.example&gt;</dd>
+        <dt>To</dt><dd>Vivienne Aster &lt;v.aster@meridian-residential.example&gt;</dd>
+        <dt>Date</dt><dd>Thursday, 9:47 AM</dd>
+      </dl>
+    </div>
+    <div class="mail-body" id="mailBody"></div>
+  </div>
+</section>
+
+<!-- ══════════════ 03 THE BRIEFING — arrives as email ══════════════ -->
+<section class="screen" id="s3">
+  <div class="rise">
+    <div class="eyebrow"><span class="bar"></span><span class="label label-brass">III — The briefing</span></div>
+    <h1>At 9:51, everything the thread is owed, in one place.</h1>
+    <p class="deck">Not a portal and not a new tool — an email. Every line in it opens the record
+    it came from.</p>
+  </div>
+
+  <div class="panel brief rise" style="margin-top:34px">
+    <div class="mail-chrome">
+      <span class="label" style="display:flex;align-items:center;gap:12px"><span class="envelope"></span> Inbox — Vivienne Aster</span>
+      <span class="label">9:51 AM</span>
+    </div>
+    <div class="mail-head">
+      <h2>Briefing — Adrian Kessler, 18 Coriander Lane</h2>
+      <dl class="mail-meta">
+        <dt>From</dt><dd>Meridian Briefings &lt;briefings@meridian-residential.example&gt;</dd>
+        <dt>To</dt><dd>Vivienne Aster &lt;v.aster@meridian-residential.example&gt;</dd>
+        <dt>Re</dt><dd>Thread of 6 Aug — client, follow-up overdue since Monday</dd>
+      </dl>
+    </div>
+    <div class="brief-tally">
+      <div class="tally-bar">
+        <div class="count" id="counter"></div>
+        <div class="integrity" id="integrity"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel rise" style="animation-delay:.04s">
+    <div class="sec-head"><h3>The client</h3><span class="src" id="buyerSrcCount"></span></div>
+    <hr class="hr">
+    <div class="sec-body"><div class="grid2"><ul class="facts" id="fBuyerA"></ul><ul class="facts" id="fBuyerB"></ul></div></div>
+  </div>
+
+  <div class="panel rise" style="animation-delay:.08s">
+    <div class="sec-head"><h3>The listing he named — 18 Coriander Lane</h3><span class="src">Listings DB · record #114</span></div>
+    <hr class="hr">
+    <div class="sec-body"><div class="grid2"><ul class="facts" id="fListA"></ul><ul class="facts" id="fListB"></ul></div></div>
+  </div>
+
+  <div class="panel rise" style="animation-delay:.12s">
+    <div class="sec-head"><h3>Comparables</h3><span class="src">Listings DB · records #103, #121, #109</span></div>
+    <hr class="hr">
+    <div class="sec-body">
+      <div class="table-scroll">
+        <table class="comps">
+          <thead><tr><th>Property</th><th>Status</th><th class="r">Price</th><th class="r">$ / sq ft</th><th style="padding-left:14px">Source</th></tr></thead>
+          <tbody id="compRows"></tbody>
+        </table>
+      </div>
+      <ul class="facts" style="margin-top:20px" id="fDerived"></ul>
+    </div>
+  </div>
+
+  <div class="panel insight rise" style="animation-delay:.16s">
+    <div class="sec-head"><h3>First question — answered in your notes</h3><span class="src">Your notes</span></div>
+    <hr class="hr">
+    <div class="sec-body">
+      <p class="insight-lead" id="insightLead"></p>
+      <ul class="facts" style="margin-top:20px" id="fOff"></ul>
+    </div>
+  </div>
+
+  <div class="panel rise" style="animation-delay:.2s">
+    <div class="sec-head"><h3>Second question — no answer in any connected record</h3><span class="src">Awaiting confirmation</span></div>
+    <hr class="hr">
+    <div class="sec-body">
+      <p class="muted" style="font-size:13.5px; margin-bottom:18px; max-width:70ch">
+        The guest house appears in record #114; its permit status does not. Nothing is inferred
+        from the gap, and nothing is written to fill it.
+      </p>
+      <div id="confirmBlocks"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 04 REPLY BLOCKS ══════════════ -->
+<section class="screen" id="s4">
+  <div class="rise">
+    <div class="eyebrow"><span class="bar"></span><span class="label label-brass">IV — Structured reply blocks</span></div>
+    <h1>A reply skeleton and a checklist, every line still carrying its source.</h1>
+    <p class="deck">Further down the same email. Nothing to open, nothing to log in to — the
+    agent replies from the mail client already in front of them.</p>
+    <div class="caption-rule">
+      <span class="q"></span>
+      <span>Drafts are structured blocks, not ghostwritten voice — the agent stays the author.</span>
+    </div>
+  </div>
+
+  <div class="panel rise" style="animation-delay:.04s">
+    <div class="block-head"><div class="lhs"><span class="idx">01</span><h4>Reply skeleton</h4></div>
+      <span class="tally" id="skelTally"></span></div>
+    <div class="sec-body">
+      <p class="muted" style="font-size:13px; margin-bottom:22px; max-width:70ch">
+        Lines to write through, in order. Each factual sentence keeps the chip that sources it, so the
+        chips travel with the words while you edit them.
+      </p>
+      <div class="skeleton" id="skeleton"></div>
+    </div>
+  </div>
+
+  <div class="panel rise" style="animation-delay:.08s">
+    <div class="block-head"><div class="lhs"><span class="idx">02</span><h4>Send checklist</h4></div>
+      <span class="tally" id="tally"></span></div>
+    <div class="sec-body">
+      <ul class="check" id="checklist"></ul>
+      <p class="muted" style="margin-top:22px; font-size:13px" id="sendNote"></p>
+    </div>
+  </div>
+</section>
+
+<footer class="pubfoot">Demonstration with fictional data — Josh Tseng</footer>
+
+</main>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Source record">
+  <div class="drawer-head" style="position:relative">
+    <span class="kind" id="dKind"></span>
+    <h3 id="dTitle"></h3>
+    <div class="meta" id="dMeta"></div>
+    <button class="drawer-close" id="dClose" aria-label="Close">&times;</button>
+  </div>
+  <div class="drawer-body" id="dBody"></div>
+  <div class="drawer-foot" id="dFoot"></div>
+</aside>
+
+<div class="dock">
+  <div class="dock-in">
+    <span class="hint" id="hint">Click any chip to open its source</span>
+    <button class="advance" id="advance"><span id="advanceLabel">See full context</span><span>&rarr;</span></button>
+  </div>
+</div>
+
+<script>
+/* =========================================================================
+   SOURCES — the records. Rendered in the drawer AND on the page, from the
+   same arrays, so the demo cannot show a fact its record does not contain.
+   ========================================================================= */
+
+/* ── FILING · the two attachments, as text layers ───────────────────────────
+   The gate checks the model's extraction against these lines. That is the
+   whole mechanism: a field that is not findable here is not a field.        */
+
+const DOC_A = {
+  id:"docA", kind:"Attachment · extracted text layer",
+  title:"Addendum_signed_FINAL(2).pdf",
+  meta:"Received 8:12 AM · 3 pages · a text layer, not an image",
+  lines:[
+    {id:"a1", label:"p1 · line 1",  text:"ADDENDUM TO PURCHASE AGREEMENT"},
+    {id:"a2", label:"p1 · line 4",  text:"This Addendum is attached to and made part of the Purchase Agreement dated 14 August 2026 for the property commonly known as 12 Oak St, Springfield."},
+    {id:"a3", label:"p1 · line 9",  text:"Buyer: Whitfield, Marguerite A."},
+    {id:"a4", label:"p1 · line 10", text:"Seller: Ardenwood Holdings LLC"},
+    {id:"a5", label:"p2 · line 3",  text:"Paragraph 7 (Financing) is deleted in its entirety and replaced with the following:"},
+    {id:"a6", label:"p3 · line 12", text:"Buyer signature: /s/ M. A. Whitfield — dated 27 August 2026"}
+  ],
+  foot:"Every field the system claims to have read had to be found in these lines, verbatim. A field that is not here is not a field."
+};
+
+const DOC_B = {
+  id:"docB", kind:"Attachment · extracted text layer",
+  title:"addendum_exec.pdf",
+  meta:"Received 9:03 AM · 2 pages · a text layer, not an image",
+  lines:[
+    {id:"b1", label:"p1 · line 1", text:"ADDENDUM TO PURCHASE AGREEMENT"},
+    {id:"b2", label:"p1 · line 3", text:"…for the property commonly known as 88 Fennimore Ridge Road, Springfield."},
+    {id:"b3", label:"p1 · line 8", text:"Buyer: Calloway, Theodore"},
+    {id:"b4", label:"p2 · line 9", text:"Buyer signature: /s/ T. Calloway — dated 26 August 2026"}
+  ],
+  foot:"Nothing is wrong with this document. It is complete, it is signed, and every field was found in its own text layer. It still does not get filed."
+};
+
+const FOLDERS = {
+  id:"folders", kind:"Your Drive · Active Transactions",
+  title:"Folder registry",
+  meta:"The folder tree is the registry — nine active transactions",
+  lines:[
+    {id:"f1", label:"Folder", text:"12 Oak St — Whitfield"},
+    {id:"f2", label:"Folder", text:"4 Perrin Row — Bettancourt"},
+    {id:"f3", label:"Folder", text:"8 Fennimore Ridge — Calloway"},
+    {id:"f4", label:"Folder", text:"2 Hallidie Heights Terrace — Vantol"},
+    {id:"f5", label:"Folder", text:"305 Cypress Point Road — Ruiz"},
+    {id:"f6", label:"Folder", text:"61 Draycott Row — Anselm"},
+    {id:"f7", label:"Folder", text:"9 Tessaro Way — Okelo"},
+    {id:"f8", label:"Folder", text:"508 Windham Quay — Marchetti"},
+    {id:"f9", label:"Folder", text:"84 Lisle Carrow — Neave"},
+    {id:"fnone", label:"88 Fennimore Ridge Road", text:"— no folder. The nearest key is “8 Fennimore Ridge”, which is a different address.", empty:true}
+  ],
+  foot:"Exact match on the normalized address. Loosening that is a policy change with an eval behind it, never an inline tweak."
+};
+
+/* ── THE THREAD · an ongoing client, not an inbound lead ────────────────── */
+
+const THREAD = {
+  id:"thread", kind:"Your inbox · read-only",
+  title:"Adrian Kessler — thread since 6 August",
+  meta:"Five messages · client · your last reply 18 August",
+  lines:[
+    {id:"m1", label:"6 Aug · in",   text:"First contact. Referred by Claire Bettancourt, who closed with your office last spring. Relocating from Seattle in the new year; taking over as CTO at Halcyon Robotics, start date 15 January. Wants to be under contract before the holidays."},
+    {id:"m2", label:"7 Aug · out",  text:"You replied, with four listings. 18 Coriander Lane was one of them."},
+    {id:"m3", label:"14 Aug · in",  text:"Narrowed to Coriander Lane. Asked to see it on the next trip out."},
+    {id:"m4", label:"18 Aug · out", text:"You replied, offering two viewing windows."},
+    {id:"m5", label:"23 Aug · in",  text:"The two questions: whether anything is quietly available, and whether the guest house is permitted."},
+    {id:"m6", label:"Since 23 Aug", text:"— no reply sent", empty:true}
+  ],
+  foot: "Read-only credential. Meridian Residential can read this thread and cannot reply to it, draft into it, or send from it."
+};
+
+const EMAIL = {
+  id: "email", kind: "Your inbox · read-only",
+  title: "Adrian Kessler — still the two questions",
+  meta: "Received Thursday 9:47 AM · a.kessler@halcyonrobotics.example",
+  lines: [
+    { id:"p1", label:"¶1", text:"Vivienne — circling back on my note from Sunday. No pressure; I know the Perrin closing landed on top of you. But we are booking flights this week, so I would like to get the two questions closed out before we do." },
+    { id:"p2", label:"¶2", text:"Where we are, unchanged: 18 Coriander Lane in Marlowe Ridge is still the one. Our range is $8–12M, all cash, no sale contingency — our Seattle house is already spoken for." },
+    { id:"p3", label:"¶3", text:"The two questions again:" },
+    { id:"p4", label:"¶4", q:true, text:"1. Frankly we would rather not be seen shopping publicly. Is there anything in Marlowe Ridge or immediately adjacent that is quietly available and not on the MLS? We would rather hear about one good off-market house than tour six listed ones." },
+    { id:"p5", label:"¶5", q:true, unanswerable:true, text:"2. The listing photographs show a separate guest house. Is it permitted as an independent dwelling, and would we be allowed to run it as a full-time office — I'll have a small team on site two days a week. This is close to a deal-breaker for us." },
+    { id:"p6", label:"¶6", text:"We can be there Thursday or Friday of next week." },
+    { id:"p7", label:"¶7", text:"Adrian Kessler — Chief Technology Officer, Halcyon Robotics" }
+  ],
+  foot: "Read-only credential. Meridian Residential can read this thread and cannot reply to it, draft into it, or send from it."
+};
+
+/* Listings DB. The demo names four; the rest are here so the book has depth. */
+const LISTINGS = {
+  114: { rec:114, address:"18 Coriander Lane", hood:"Marlowe Ridge", status:"Active", price:11950000, sqft:8400, ppsf:1423,
+    lines:[
+      {id:"addr",  label:"Address",     text:"18 Coriander Lane, Marlowe Ridge"},
+      {id:"status",label:"Status",      text:"Active · 41 days on market"},
+      {id:"price", label:"List price",  text:"$11,950,000"},
+      {id:"orig",  label:"Original",    text:"$12,400,000 — adjusted on day 30"},
+      {id:"beds",  label:"Rooms",       text:"6 bd / 7.5 ba"},
+      {id:"size",  label:"Interior",    text:"8,400 sq ft"},
+      {id:"lot",   label:"Lot",         text:"1.24 acres"},
+      {id:"built", label:"Year built",  text:"2019"},
+      {id:"guest", label:"Guest house", text:"1,180 sq ft, detached"},
+      {id:"permit",label:"Permit status", text:"— not recorded in this listing", empty:true}
+    ],
+    foot: "Listings DB record #114. The permit field is empty. It is not defaulted, guessed, or filled from a comparable." },
+
+  103: { rec:103, address:"2 Hallidie Heights Terrace", hood:"Hallidie Heights", status:"Sold", price:12100000, ask:12600000, sqft:8900, ppsf:1360, closed:"121 days ago",
+    lines:[
+      {id:"addr",  label:"Address",   text:"2 Hallidie Heights Terrace, Hallidie Heights"},
+      {id:"status",label:"Status",    text:"Sold · closed 121 days ago"},
+      {id:"price", label:"Sale price",text:"$12,100,000"},
+      {id:"ask",   label:"Asked",     text:"$12,600,000 — 96.0% of ask"},
+      {id:"size",  label:"Interior",  text:"8,900 sq ft"},
+      {id:"built", label:"Year built",text:"2020"},
+      {id:"guest", label:"Guest house", text:"Permitted accessory dwelling"},
+      {id:"ppsf",  label:"$ / sq ft", text:"$1,360"}
+    ],
+    foot: "Listings DB record #103." },
+
+  121: { rec:121, address:"305 Cypress Point Road", hood:"Cypress Point", status:"Sold", price:9400000, ask:9750000, sqft:7100, ppsf:1324, closed:"62 days ago",
+    lines:[
+      {id:"addr",  label:"Address",   text:"305 Cypress Point Road, Cypress Point"},
+      {id:"status",label:"Status",    text:"Sold · closed 62 days ago"},
+      {id:"price", label:"Sale price",text:"$9,400,000"},
+      {id:"ask",   label:"Asked",     text:"$9,750,000 — 96.4% of ask"},
+      {id:"size",  label:"Interior",  text:"7,100 sq ft"},
+      {id:"built", label:"Year built",text:"2021"},
+      {id:"ppsf",  label:"$ / sq ft", text:"$1,324"}
+    ],
+    foot: "Listings DB record #121." },
+
+  109: { rec:109, address:"77 Verrazzano Sands", hood:"Verrazzano Sands", status:"Active", price:8850000, sqft:6600, ppsf:1341, dom:118,
+    lines:[
+      {id:"addr",  label:"Address",   text:"77 Verrazzano Sands, Verrazzano Sands"},
+      {id:"status",label:"Status",    text:"Active · 118 days on market"},
+      {id:"price", label:"List price",text:"$8,850,000"},
+      {id:"orig",  label:"Original",  text:"$8,850,000 — no reduction to date"},
+      {id:"size",  label:"Interior",  text:"6,600 sq ft"},
+      {id:"built", label:"Year built",text:"2018"},
+      {id:"ppsf",  label:"$ / sq ft", text:"$1,341"}
+    ],
+    foot: "Listings DB record #109." },
+
+  /* depth — never surfaced by the script, present in the book */
+  101: { rec:101, address:"1140 Anselm Bluff",  hood:"Hallidie Heights", status:"Active",  price:19500000, sqft:13200, ppsf:1477 },
+  106: { rec:106, address:"23 Ferrand Point",   hood:"Cypress Point",    status:"Active",  price:15250000, sqft:10400, ppsf:1466 },
+  112: { rec:112, address:"508 Windham Quay",   hood:"The Landings",     status:"Active",  price:6900000,  sqft:4600,  ppsf:1500 },
+  117: { rec:117, address:"61 Draycott Row",    hood:"Old Harbor",       status:"Pending", price:4700000,  sqft:3800,  ppsf:1237 },
+  123: { rec:123, address:"9 Tessaro Way",      hood:"Old Harbor",       status:"Active",  price:3250000,  sqft:2900,  ppsf:1121 },
+  127: { rec:127, address:"84 Lisle Carrow",    hood:"Marlowe Ridge",    status:"Active",  price:7400000,  sqft:5200,  ppsf:1423 }
+};
+
+const NOTE_MAR12 = {
+  id:"note12", kind:"Your notes",
+  title:"Henderson — 12 Marlowe Court",
+  meta:"Recorded by you · 12 March, 4:12 PM",
+  lines:[
+    {id:"n1", label:"Context", text:"Called about their insurance renewal."},
+    {id:"n2", label:"Said",    text:"Would listen to anything over ten once Sophie finishes the school year."},
+    {id:"n3", label:"Said",    text:"Sophie finishes in June."},
+    {id:"n4", label:"Said",    text:"Not listed, not looking. Do not circulate."},
+    {id:"n5", label:"Follow-up", text:"— none scheduled", empty:true}
+  ],
+  foot: "Your note. It has never left this book, and nothing here is pooled with any other agent's."
+};
+
+const FILE_2018 = {
+  id:"file18", kind:"Your transaction file",
+  title:"12 Marlowe Court — 2018",
+  meta:"Closed 2018 · you represented the buyers",
+  lines:[
+    {id:"buyers", label:"Buyers",   text:"Henderson"},
+    {id:"hood",   label:"Neighborhood", text:"Marlowe Ridge"},
+    {id:"size",   label:"Interior", text:"7,900 sq ft · 6 bd / 7 ba"},
+    {id:"mls",    label:"MLS record", text:"— none. Never publicly listed.", empty:true},
+    {id:"agent",  label:"Represented by", text:"You, buy side"}
+  ],
+  foot: "Your transaction file."
+};
+
+const FILE_PERRIN = {
+  id:"filePerrin", kind:"Your transaction file",
+  title:"4 Perrin Row — April",
+  meta:"Closed April · you represented the buyers",
+  lines:[
+    {id:"buyers", label:"Buyers", text:"Bettancourt"},
+    {id:"price",  label:"Sale price", text:"$7,350,000"},
+    {id:"closed", label:"Closed", text:"April"}
+  ],
+  foot: "Your transaction file. This is how the referral in ¶1 is corroborated."
+};
+
+const SOURCES = {
+  email:EMAIL, note12:NOTE_MAR12, file18:FILE_2018, filePerrin:FILE_PERRIN,
+  thread:THREAD, docA:DOC_A, docB:DOC_B, folders:FOLDERS
+};
+
+/* =========================================================================
+   FILING — the fields read out of each document, the gates each one met,
+   and what happened as a result. The gate order is the pipeline's order.
+   ========================================================================= */
+
+const FILING_A = {
+  fields: [
+    { k:"Document type",    v:"Addendum",              chip:"p1 · line 1",  src:"docA", line:"a1" },
+    { k:"Property address", v:"12 Oak St, Springfield", chip:"p1 · line 4",  src:"docA", line:"a2" },
+    { k:"Client",           v:"Whitfield, Marguerite A.", chip:"p1 · line 9", src:"docA", line:"a3" },
+    { k:"Document date",    v:"27 August 2026",         chip:"p3 · line 12", src:"docA", line:"a6" }
+  ],
+  gates: [
+    { g:"Parse",      d:"text layer, 3 pages" },
+    { g:"Grounding",  d:"both routing fields found verbatim" },
+    { g:"Fields",     d:"addendum requires type, address, client" },
+    { g:"Resolution", d:"exactly one folder matched", chip:"Folder registry", src:"folders", line:"f1" }
+  ]
+};
+
+const FILING_B = {
+  fields: [
+    { k:"Document type",    v:"Addendum",                     chip:"p1 · line 1", src:"docB", line:"b1" },
+    { k:"Property address", v:"88 Fennimore Ridge Road, Springfield", chip:"p1 · line 3", src:"docB", line:"b2" },
+    { k:"Client",           v:"Calloway, Theodore",           chip:"p1 · line 8", src:"docB", line:"b3" },
+    { k:"Document date",    v:"26 August 2026",               chip:"p2 · line 9", src:"docB", line:"b4" }
+  ],
+  gates: [
+    { g:"Parse",      d:"text layer, 2 pages" },
+    { g:"Grounding",  d:"both routing fields found verbatim" },
+    { g:"Fields",     d:"addendum requires type, address, client" },
+    { g:"Resolution", d:"no folder matched", fail:true, chip:"Folder registry", src:"folders", line:"fnone" }
+  ]
+};
+
+/* =========================================================================
+   FACTS — every claim the response makes. `src` is mandatory; the render
+   pass below refuses to describe an unsourced entry as sourced.
+   ========================================================================= */
+
+const F = (id, sec, k, t, src, line, chip, cls) => ({ id, sec, k, t, src, line, chip, cls });
+
+const FACTS = [
+  /* — the client — */
+  F("b1","buyer","Who","Adrian Kessler — incoming CTO, Halcyon Robotics","email","p7","Email ¶7"),
+  F("b2","buyer","Standing","Your client since 6 August — five messages, two of them yours","thread","m1","Thread · 6 Aug"),
+  F("b3","buyer","Budget","$8–12M, all cash, no sale contingency","email","p2","Email ¶2"),
+  F("b4","buyer","Timeline","Start date 15 January; wants to be under contract before the holidays","thread","m1","Thread · 6 Aug"),
+  F("b5","buyer","Can travel","Thursday or Friday next week","email","p6","Email ¶6"),
+  F("b6","buyer","Handling","Would rather not be seen shopping publicly","email","p4","Email ¶4"),
+  F("b7","buyer","Referred by","Claire Bettancourt","thread","m1","Thread · 6 Aug"),
+  F("b8","buyer","That referral","Bettancourt closed 4 Perrin Row in April at $7,350,000","filePerrin","price","Your file · Apr"),
+  F("b9","buyer","Owed a reply","Since 23 August. Your last outbound was 18 August","thread","m6","Thread · 23 Aug"),
+
+  /* — listing #114 — */
+  F("l1","list","Asking","$11,950,000","listing114","price","Listing #114"),
+  F("l2","list","Size","8,400 sq ft · 6 bd / 7.5 ba","listing114","size","Listing #114"),
+  F("l3","list","Lot","1.24 acres, built 2019","listing114","lot","Listing #114"),
+  F("l4","list","On market","41 days; adjusted on day 30 from $12,400,000","listing114","orig","Listing #114"),
+  F("l5","list","Guest house","1,180 sq ft, detached","listing114","guest","Listing #114"),
+  F("l6","list","Its permit status","Not recorded — see the confirmation block below","listing114","permit","Listing #114","nil"),
+  F("l7","list","Price per sq ft","$1,423","derived:ppsf","","Derived · #114","derived"),
+
+  /* — derived market read — */
+  F("d1","derived","Closed band","The two closed comparables settled between $1,324 and $1,360 per sq ft","derived:band","","Derived · #103 + #121","derived"),
+  F("d2","derived","Where #114 sits","$1,423 per sq ft — above both closings","derived:gap","","Derived · #114 + band","derived"),
+
+  /* — the off-market match — */
+  F("o1","off","What they said","“Would listen to anything over ten once Sophie finishes the school year”","note12","n2","Your note · Mar 12"),
+  F("o2","off","When","12 March, 4:12 PM — recorded by you","note12","n1","Your note · Mar 12"),
+  F("o3","off","The trigger","Sophie finishes in June","note12","n3","Your note · Mar 12"),
+  F("o4","off","Their instruction","“Not listed, not looking. Do not circulate.”","note12","n4","Your note · Mar 12"),
+  F("o5","off","The house","12 Marlowe Court — 7,900 sq ft, 6 bd, Marlowe Ridge","file18","size","Your file · 2018"),
+  F("o6","off","Never listed","No MLS record exists for it","file18","mls","Your file · 2018"),
+  F("o7","off","Your standing","Your clients since 2018 — you represented them on the buy side","file18","agent","Your file · 2018"),
+  F("o8","off","Fit","“Over ten” sits inside his stated $8–12M range","derived:fit","","Derived · note + ¶2","derived"),
+  F("o9","off","Same neighborhood","12 Marlowe Court and 18 Coriander Lane are both in Marlowe Ridge","derived:hood","","Derived · #114 + file","derived")
+];
+
+/* Derivations — shown as arithmetic, never asserted. */
+const DERIVED = {
+  ppsf: { title:"Price per square foot — #114", rows:[
+      ["List price · #114", "$11,950,000"], ["Interior · #114", "8,400 sq ft"]],
+    out:"$11,950,000 ÷ 8,400 = $1,423 per sq ft", inputs:[["listing114","price"],["listing114","size"]] },
+  band: { title:"Closed band — #103 and #121", rows:[
+      ["#103 · $12,100,000 ÷ 8,900 sq ft", "$1,360"], ["#121 · $9,400,000 ÷ 7,100 sq ft", "$1,324"]],
+    out:"Closed band: $1,324 – $1,360 per sq ft", inputs:[["listing103","ppsf"],["listing121","ppsf"]] },
+  gap:  { title:"Where #114 sits against the band", rows:[
+      ["#114 asking", "$1,423 / sq ft"], ["Highest closing", "$1,360 / sq ft"]],
+    out:"$63 per sq ft above the highest of the two closings. No inference is drawn from that here.",
+    inputs:[["listing114","price"],["listing103","ppsf"]] },
+  fit:  { title:"Does the note match the buyer?", rows:[
+      ["Note · 12 March", "“anything over ten”"], ["Email ¶2", "$8–12M"]],
+    out:"$10M+ falls inside $8–12M.", inputs:[["note12","n2"],["email","p2"]] },
+  hood: { title:"Same neighborhood?", rows:[
+      ["Listing #114", "Marlowe Ridge"], ["Your file · 2018", "Marlowe Ridge"]],
+    out:"Both records name Marlowe Ridge. Nothing here establishes how close they are — that is not in either record.",
+    inputs:[["listing114","addr"],["file18","hood"]] }
+};
+
+/* Absence — what "No record" means, shown rather than claimed. */
+const NIL_SEARCH = {
+  kind:"Absence of record", title:"Nothing matched",
+  meta:"Searched at 9:47 AM, at the moment the message arrived",
+  lines:[
+    {id:"a", label:"Searched", text:"Your inbox (read-only)"},
+    {id:"b", label:"Searched", text:"Your notes"},
+    {id:"c", label:"Searched", text:"Your listings DB"},
+    {id:"d", label:"Result",   text:"— no matching record", empty:true},
+    {id:"e", label:"Not searched", text:"Anything outside your book. Nothing is pooled.", empty:true}
+  ],
+  foot: "An absence is recorded as an absence. Nothing is inferred to fill it."
+};
+
+/* =========================================================================
+   AWAITING CONFIRMATION — the second question. Two blocks, calm.
+   ========================================================================= */
+
+const CONFIRMS = [
+  { id:"c1",
+    ask:"Is the guest house at 18 Coriander Lane separately permitted as an independent dwelling?",
+    why:"Record #114 holds the guest house's size and states it is detached. Its permit field is empty.",
+    chip:"Listing #114", src:"listing114", line:"permit",
+    todo:"Ask the listing agent." },
+  { id:"c2",
+    ask:"Does the Marlowe Ridge covenant permit non-resident staff on site two days a week?",
+    why:"No connected record holds covenant text for Marlowe Ridge.",
+    chip:"No record", src:"nil", line:"", cls:"nil",
+    todo:"Ask the listing agent, or the HOA directly." }
+];
+
+/* =========================================================================
+   REPLY SKELETON — chips travel with the sentences.
+   ========================================================================= */
+
+const SKELETON = [
+  { cue:"Open — name the gap first, and do not explain it away",
+    parts:[["Adrian — apologies for the quiet since Sunday. Both answers are below.", {chip:"Thread · 23 Aug", src:"thread", line:"m6"}]] },
+
+  { cue:"Question 1 — the answer, without naming the house yet",
+    parts:[["On your first question: yes. I have long-standing clients in Marlowe Ridge who told me in March they would consider an offer in your range.", {chip:"Your note · Mar 12", src:"note12", line:"n2"}],
+           ["The house has never been listed and has no MLS record.", {chip:"Your file · 2018", src:"file18", line:"mls"}]] },
+
+  { cue:"Question 1 — the permission you do not have yet",
+    parts:[["", {confirm:"Do not name the property or the street until the Hendersons agree again. Their note ends “do not circulate,” and it is five months old.", chip:"Your note · Mar 12", src:"note12", line:"n4"}]] },
+
+  { cue:"Question 2 — what the record does hold",
+    parts:[["On the guest house: it is 1,180 square feet and detached.", {chip:"Listing #114", src:"listing114", line:"guest"}],
+           ["For a comparison, 2 Hallidie Heights Terrace closed at $12,100,000 with a permitted accessory dwelling.", {chip:"Listing #103", src:"listing103", line:"guest"}]] },
+
+  { cue:"Question 2 — what no record holds",
+    parts:[["", {confirm:"Permit status for the Coriander Lane guest house — record #114's permit field is empty. Ask the listing agent.", chip:"Listing #114", src:"listing114", line:"permit"}],
+           ["", {confirm:"Whether the Marlowe Ridge covenant allows staff on site two days a week. No connected record holds covenant text.", chip:"No record", src:"nil", line:"", cls:"nil"}]] },
+
+  { cue:"Close — the visit he asked for",
+    parts:[["He can travel Thursday or Friday next week.", {chip:"Email ¶6", src:"email", line:"p6"}],
+           ["", {confirm:"Your own Thursday. Your calendar is not a connected source, so the system does not know it.", chip:"No record", src:"nil", line:"", cls:"nil"}]] },
+
+  { cue:"Sign-off", parts:[["— Vivienne", null]] }
+];
+
+const CHECKLIST = [
+  ["Ask the listing agent for the guest-house permit status", "Record #114's permit field is empty"],
+  ["Ask the listing agent or the HOA about covenant use", "No connected record holds covenant text"],
+  ["Call the Hendersons before the address goes in writing", "Their note says “do not circulate” and is five months old"],
+  ["Check your own Thursday", "Your calendar is not a connected source"]
+];
+
+/* =========================================================================
+   RENDER
+   ========================================================================= */
+
+const el = id => document.getElementById(id);
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+/* the chip is the only way a claim is allowed to appear */
+function chipHTML(f){
+  if (!f || !f.chip) return "";
+  const cls = f.cls ? " " + f.cls : "";
+  return `<button class="chip${cls}" data-src="${f.src||""}" data-line="${f.line||""}">${esc(f.chip)}</button>`;
+}
+function factLI(f){
+  return `<li><div class="k">${esc(f.k)}</div><div class="t">${esc(f.t)}${chipHTML(f)}</div></li>`;
+}
+const bySec = s => FACTS.filter(f => f.sec === s);
+
+function renderEmail(){
+  el("mailBody").innerHTML = EMAIL.lines.map(l =>
+    `<div class="para${l.q?" q":""}${l.unanswerable?" unanswerable":""}">
+       <div class="pn">${l.label}</div><div class="pt">${esc(l.text)}</div>
+     </div>`).join("");
+}
+
+/* ---------- 01 filing ---------- */
+
+function fieldLI(f){
+  return `<li><div class="fk">${esc(f.k)}</div>
+    <div class="fv">${esc(f.v)}${chipHTML(f)}</div></li>`;
+}
+function gateSpan(g){
+  return `<span class="g${g.fail?" no":""}"><span class="gk">${esc(g.g)} — ${esc(g.d)}</span>${chipHTML(g)}</span>`;
+}
+
+function renderFiling(){
+  el("fieldsA").innerHTML = FILING_A.fields.map(fieldLI).join("");
+  el("gatesA").innerHTML  = FILING_A.gates.map(gateSpan).join("");
+  el("fieldsB").innerHTML = FILING_B.fields.map(fieldLI).join("");
+  el("gatesB").innerHTML  = FILING_B.gates.map(gateSpan).join("");
+
+  el("routedPath").textContent = "/Active Transactions/12 Oak St — Whitfield/Addendums";
+  el("routedSub").innerHTML =
+    `Saved as <b>addendum_12OakStSpringfield_WhitfieldMargueriteA.pdf</b> — a name built from the ` +
+    `address inside the document rather than the one on the file. The file was called ` +
+    `<i>FINAL(2)</i>.`;
+
+  el("heldSub").innerHTML =
+    `Saved to <span class="path">/Active Transactions/_Needs review</span> — flagged, never lost. ` +
+    `The address was read correctly and found verbatim in the document; it simply matches no ` +
+    `folder in the registry, because that deal folder has not been made yet. It is not fuzzy-matched ` +
+    `to “8 Fennimore Ridge”, not filed under the nearest thing, and not left to a default.` +
+    chipHTML({ chip:"Folder registry", src:"folders", line:"fnone" });
+}
+
+/* ---------- 02 the thread ---------- */
+
+function renderThread(){
+  el("threadList").innerHTML = THREAD.lines.map(l =>
+    `<li class="${l.empty?"gap":""}"><span class="tw">${esc(l.label)}</span>
+       <span class="tx">${esc(l.text)}</span></li>`).join("");
+
+  el("overdueLine").innerHTML =
+    `His message of 23 August has no reply. Four days.` +
+    chipHTML({ chip:"Thread · 23 Aug", src:"thread", line:"m6" });
+
+  el("overdueWhy").innerHTML =
+    `The threshold is three days, and it is a line in <b>policy.yaml</b> — not a judgement the ` +
+    `model makes and not something a prompt can talk itself out of. This thread crossed it on ` +
+    `Wednesday morning.`;
+}
+
+function splitHalf(arr){ const m = Math.ceil(arr.length/2); return [arr.slice(0,m), arr.slice(m)]; }
+
+function renderContext(){
+  const [ba,bb] = splitHalf(bySec("buyer"));
+  el("fBuyerA").innerHTML = ba.map(factLI).join("");
+  el("fBuyerB").innerHTML = bb.map(factLI).join("");
+
+  const [la,lb] = splitHalf(bySec("list"));
+  el("fListA").innerHTML = la.map(factLI).join("");
+  el("fListB").innerHTML = lb.map(factLI).join("");
+
+  el("compRows").innerHTML = [103,121,109].map(r => {
+    const l = LISTINGS[r];
+    const status = l.status === "Sold" ? `Sold · ${l.closed}` : `Active · ${l.dom} days`;
+    return `<tr>
+      <td class="addr">${l.address}<small>${l.hood} · ${l.sqft.toLocaleString()} sq ft</small></td>
+      <td>${status}</td>
+      <td class="r"><span class="price">$${l.price.toLocaleString()}</span></td>
+      <td class="r num">$${l.ppsf.toLocaleString()}</td>
+      <td style="padding-left:14px"><button class="chip" data-src="listing${r}" data-line="price">Listing #${r}</button></td>
+    </tr>`;
+  }).join("");
+
+  el("fDerived").innerHTML = bySec("derived").map(factLI).join("");
+
+  /* the section label counts its own rows rather than stating a number */
+  const buyerFacts = bySec("buyer");
+  const distinct = new Set(buyerFacts.map(f => f.src)).size;
+  el("buyerSrcCount").textContent = `${buyerFacts.length} claims · ${distinct} distinct sources`;
+
+  el("insightLead").innerHTML =
+    `He asked for something quietly available. You recorded one on 12 March, and no follow-up was ever scheduled.` +
+    chipHTML({ chip:"Your note · Mar 12", src:"note12", line:"n5" });
+  el("fOff").innerHTML = bySec("off").map(factLI).join("");
+
+  el("confirmBlocks").innerHTML = CONFIRMS.map(c => `
+    <div class="confirm-block">
+      <span class="cb-label">Awaiting confirmation</span>
+      <div class="cb-ask">${esc(c.ask)}</div>
+      <div class="cb-why">${esc(c.why)}${chipHTML(c)}</div>
+      <div class="cb-do"><b>Do:</b> ${esc(c.todo)}</div>
+    </div>`).join("");
+
+  renderCounter();
+}
+
+/* The counter counts the array. It is not typed in. */
+function renderCounter(){
+  const total = FACTS.length;
+  const sourced = FACTS.filter(f => f.src && f.chip).length;
+  const unsourced = total - sourced;
+
+  el("counter").innerHTML =
+    `<span><b>${total}</b> facts</span><span class="div">·</span>` +
+    `<span><b>${sourced}</b> sourced</span><span class="div">·</span>` +
+    `<span><b>${CONFIRMS.length}</b> awaiting confirmation</span>`;
+
+  const ig = el("integrity");
+  if (unsourced === 0){
+    ig.classList.remove("bad");
+    ig.innerHTML = `<b>No third state.</b> Every claim above is either sourced or flagged, ` +
+                   `checked when the briefing was assembled. Sourced is not confirmed — only you confirm.`;
+  } else {
+    ig.classList.add("bad");
+    ig.innerHTML = `<b>${unsourced} unsourced claim(s) reached the page.</b> This banner is the failure mode, and it is visible.`;
+  }
+}
+
+function renderBlocks(){
+  el("skeleton").innerHTML = SKELETON.map(s => {
+    const body = s.parts.map(([text, meta]) => {
+      if (meta && meta.confirm){
+        return `<span class="confirm-inline">[CONFIRM: ${esc(meta.confirm)}]</span>${chipHTML(meta)}`;
+      }
+      return esc(text) + chipHTML(meta);
+    }).join(" ");
+    return `<div class="line"><span class="cue">${esc(s.cue)}</span>${body}</div>`;
+  }).join("");
+
+  const inline = SKELETON.flatMap(s => s.parts).filter(([,m]) => m && m.confirm).length;
+  el("skelTally").textContent = `${inline} lines await confirmation`;
+
+  const ul = el("checklist");
+  ul.innerHTML = CHECKLIST.map(([t,s]) =>
+    `<li><span class="bx"></span><span class="txt">${esc(t)}<small>${esc(s)}</small></span></li>`).join("");
+  ul.querySelectorAll("li").forEach(li => li.addEventListener("click", () => { li.classList.toggle("done"); tally(); }));
+  tally();
+}
+
+function tally(){
+  const items = document.querySelectorAll("#checklist li");
+  const done = document.querySelectorAll("#checklist li.done").length;
+  const t = el("tally");
+  t.textContent = `${done} of ${items.length} cleared`;
+  t.classList.toggle("full", done === items.length);
+  el("sendNote").innerHTML = done === items.length
+    ? "Checklist cleared by you. The system still says only that these facts are <b>sourced</b> — you are the one who confirmed them. You compose and send from your own mail client."
+    : "You compose and send from your own mail client. Meridian Residential holds a read-only credential and cannot put a message on the wire.";
+}
+
+/* =========================================================================
+   SOURCE DRAWER
+   ========================================================================= */
+
+function resolve(srcId){
+  if (!srcId) return null;
+  if (srcId === "nil") return NIL_SEARCH;
+  if (srcId.startsWith("listing")){
+    const rec = srcId.replace("listing","");
+    const l = LISTINGS[rec];
+    if (!l || !l.lines) return null;
+    return { kind:"Listings DB", title:`#${l.rec} — ${l.address}`, meta:`${l.hood} · ${l.status}`, lines:l.lines, foot:l.foot };
+  }
+  if (srcId.startsWith("derived:")){
+    return { derived: DERIVED[srcId.split(":")[1]] };
+  }
+  const s = SOURCES[srcId];
+  return s ? { kind:s.kind, title:s.title, meta:s.meta, lines:s.lines, foot:s.foot } : null;
+}
+
+function openSource(srcId, lineId){
+  const s = resolve(srcId);
+  if (!s) return;
+
+  if (s.derived){
+    const d = s.derived;
+    el("dKind").textContent = "Derived — arithmetic over sourced records";
+    el("dTitle").textContent = d.title;
+    el("dMeta").textContent = "Computed at render from the records below";
+    el("dBody").innerHTML =
+      `<div class="derived-calc">` +
+      d.rows.map(([k,v]) => `<div class="row"><span class="muted">${esc(k)}</span><span>${esc(v)}</span></div>`).join("") +
+      `<div class="out">${esc(d.out)}</div></div>` +
+      `<div style="padding:0 28px 8px" class="label">Inputs</div>` +
+      `<div style="padding:0 28px 18px">` +
+      d.inputs.map(([sid,lid]) => {
+        const r = resolve(sid);
+        return `<button class="chip" style="margin:0 8px 8px 0" data-src="${sid}" data-line="${lid}">${esc(r ? r.title : sid)}</button>`;
+      }).join("") + `</div>`;
+    el("dFoot").innerHTML = "A derivation is shown, not asserted. Every input opens too.";
+  } else {
+    el("dKind").textContent = s.kind;
+    el("dTitle").textContent = s.title;
+    el("dMeta").textContent = s.meta || "";
+    el("dBody").innerHTML = s.lines.map(l =>
+      `<div class="srcline${l.id === lineId ? " hit" : ""}${l.empty ? " empty" : ""}">
+         <div class="sl-k">${esc(l.label)}</div><div class="sl-v">${esc(l.text)}</div>
+       </div>`).join("");
+    el("dFoot").innerHTML = esc(s.foot || "");
+  }
+
+  el("drawer").classList.add("open");
+  el("scrim").classList.add("open");
+  document.body.classList.add("drawer-open");
+  const hit = document.querySelector(".srcline.hit");
+  if (hit) hit.scrollIntoView({ block:"center" });
+}
+
+function closeSource(){
+  el("drawer").classList.remove("open");
+  el("scrim").classList.remove("open");
+  document.body.classList.remove("drawer-open");
+}
+
+document.addEventListener("click", e => {
+  const chip = e.target.closest(".chip");
+  if (chip){ e.stopPropagation(); openSource(chip.dataset.src, chip.dataset.line); return; }
+});
+el("scrim").addEventListener("click", closeSource);
+el("dClose").addEventListener("click", closeSource);
+
+/* =========================================================================
+   FLOW
+   ========================================================================= */
+
+let step = 1;
+const STEPS = 4;
+const LABELS = { 1:"Open the thread", 2:"Open the briefing", 3:"Open reply blocks", 4:"Restart" };
+const HINTS  = { 1:"Every field opens the line it was read from",
+                 2:"Paragraph numbers become the citations",
+                 3:"Click any chip to open its source",
+                 4:"Click any chip to open its source" };
+
+function setStep(n){
+  step = n;
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("live"));
+  el("s"+n).classList.add("live");
+  document.querySelectorAll(".step").forEach(s => {
+    const i = +s.dataset.step;
+    s.classList.toggle("on", i === n);
+    s.classList.toggle("done", i < n);
+  });
+  el("advanceLabel").textContent = LABELS[n];
+  el("hint").textContent = HINTS[n];
+  el("advance").classList.toggle("ghost", n === STEPS);
+  window.scrollTo(0,0);
+}
+
+function next(){ setStep(step === STEPS ? 1 : step + 1); }
+
+el("advance").addEventListener("click", next);
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape"){ closeSource(); return; }
+  if (el("drawer").classList.contains("open")) return;
+  if (e.key === "ArrowRight" || e.key === " " || e.key === "Enter"){
+    if (document.activeElement && document.activeElement.closest(".check, .chip")) return;
+    e.preventDefault(); next();
+  }
+});
+
+renderFiling();
+renderThread();
+renderEmail();
+renderContext();
+renderBlocks();
+setStep(1);
+</script>
+</body>
+</html>

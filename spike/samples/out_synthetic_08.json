@@ -1,0 +1,43 @@
+{
+  "people": [
+    "Bettina",
+    "Bettina's husband",
+    "Bettina's daughter",
+    "the couple on Sunday"
+  ],
+  "orgs": [],
+  "dates_or_deadlines": [
+    "Sunday (showing, the couple)",
+    "Tuesday (lockbox left hanging open)",
+    "after my daughter's term ends",
+    "six weeks (implied stale-listing concern)"
+  ],
+  "amounts": [],
+  "property_refs": [
+    "the basement",
+    "the foundation"
+  ],
+  "doc_mentions": [
+    "the foundation report (from 2019)"
+  ],
+  "asks_or_questions": [
+    "tell me what you actually think and not the nice version",
+    "whether to put the 2019 foundation report out in front of people or whether that just makes them look harder",
+    "implicit question about what the forty-minute basement visit by the Sunday couple means"
+  ],
+  "commitments_made": [
+    "will leave the showing-feedback concern alone after saying this once"
+  ],
+  "anything_uncertain": [
+    "property address not stated",
+    "recipient (agent) name not stated",
+    "what the Sunday couple found or did not find in the basement is unknown",
+    "foundation report conclusion described only as 'fine then' — no specific findings or engineer named",
+    "current list price not stated",
+    "'six weeks' is a hypothetical framing, not a firm deadline",
+    "daughter's term end date not stated",
+    "who left the lockbox open on Tuesday is not identified",
+    "Bettina's two prior sale experiences described only as 'badly' — no details"
+  ],
+  "_source": "synthetic_08.txt"
+}
